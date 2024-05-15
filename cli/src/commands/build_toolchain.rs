@@ -89,6 +89,10 @@ impl BuildToolchainCmd {
                 "CARGO_TARGET_RISCV64IM_UNICORN_ZKVM_ELF_RUSTFLAGS",
                 "-Cpasses=loweratomic",
             )
+            .env(
+                "CARGO_TARGET_RISCV64IM_SUCCINCT_ZKVM_ELF_RUSTFLAGS",
+                "-Cpasses=loweratomic",
+            )
             .args(["x.py", "build"])
             .current_dir(&rust_dir)
             .run()?;
@@ -101,6 +105,10 @@ impl BuildToolchainCmd {
             )
             .env(
                 "CARGO_TARGET_RISCV64IM_UNICORN_ZKVM_ELF_RUSTFLAGS",
+                "-Cpasses=loweratomic",
+            )
+            .env(
+                "CARGO_TARGET_RISCV64IM_SUCCINCT_ZKVM_ELF_RUSTFLAGS",
                 "-Cpasses=loweratomic",
             )
             .args(["x.py", "build", "--stage", "2"])

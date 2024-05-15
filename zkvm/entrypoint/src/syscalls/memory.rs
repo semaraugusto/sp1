@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const SYSTEM_START: usize = 0x0C00_0000;
+// const SYSTEM_START: usize = 0x0C00_0000;
+const SYSTEM_START: usize = 0xF_0000_0000;
+// const SYSTEM_START: usize = 0xFFFF_FFFF_FFFF;
 
 #[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn sys_alloc_aligned(bytes: usize, align: usize) -> *mut u8 {
+    // let align = 8usize;
     extern "C" {
         // https://lld.llvm.org/ELF/linker_script.html#sections-command
         static _end: u8;
@@ -33,18 +36,107 @@ pub unsafe extern "C" fn sys_alloc_aligned(bytes: usize, align: usize) -> *mut u
         heap_pos = unsafe { (&_end) as *const u8 as usize };
     }
 
+    // let msg = "start align -----------------------------------";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x2,
+    //     in("a0") 1,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+    //
+    // let msg = "bytes";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") bytes,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+    //
+    // let msg = "align";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") align,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+
     let offset = heap_pos & (align - 1);
+
+    // let msg = "offset";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") offset,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+    //
+    // let msg = "heap_pos";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") heap_pos,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+
     if offset != 0 {
         heap_pos += align - offset;
     }
+    // let msg = "aligned heap_pos";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") heap_pos,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
 
     let ptr = heap_pos as *mut u8;
     heap_pos += bytes;
 
+    // let msg = "new heap_pos";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x3,
+    //     in("a0") heap_pos,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
+
     // Check to make sure heap doesn't collide with SYSTEM memory.
     if SYSTEM_START < heap_pos {
-        panic!();
+        panic!("Heap collision with SYSTEM memory. {SYSTEM_START} < {heap_pos}")
+        // panic!();
     }
+
+    // let msg = "end align -----------------------------------";
+    // let buf = msg.as_bytes();
+    // let nbytes = buf.len();
+    // core::arch::asm!(
+    //     "ecall",
+    //     in("t0") 0x2,
+    //     in("a0") 1,
+    //     in("a1") buf.as_ptr(),
+    //     in("a2") nbytes,
+    // );
 
     unsafe { HEAP_POS = heap_pos };
     ptr
