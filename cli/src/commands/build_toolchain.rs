@@ -13,56 +13,62 @@ impl BuildToolchainCmd {
         // Get enviroment variables.
         let github_access_token = std::env::var("GITHUB_ACCESS_TOKEN");
         let build_dir = std::env::var("SP1_BUILD_DIR");
+        let rust_dir = PathBuf::from("/home/semar/Work/custom-rust");
 
         // Clone our rust fork, if necessary.
-        let rust_dir = match build_dir {
-            Ok(build_dir) => {
-                println!("Detected SP1_BUILD_DIR, skipping cloning rust.");
-                PathBuf::from(build_dir).join("rust")
-            }
-            Err(_) => {
-                let temp_dir = std::env::temp_dir();
-                let dir = temp_dir.join("sp1-rust");
-                if dir.exists() {
-                    std::fs::remove_dir_all(&dir)?;
-                }
-
-                println!("No SP1_BUILD_DIR detected, cloning rust.");
-                let repo_url = match github_access_token {
-                    Ok(github_access_token) => {
-                        println!("Detected GITHUB_ACCESS_TOKEN, using it to clone rust.");
-                        format!(
-                            "https://{}@github.com/succinctlabs/rust",
-                            github_access_token
-                        )
-                    }
-                    Err(_) => {
-                        println!("No GITHUB_ACCESS_TOKEN detected. If you get throttled by Github, set it to bypass the rate limit.");
-                        "ssh://git@github.com/succinctlabs/rust".to_string()
-                    }
-                };
-                Command::new("git")
-                    .args([
-                        "clone",
-                        &repo_url,
-                        "--depth=1",
-                        "--single-branch",
-                        "--branch=succinct",
-                        "sp1-rust",
-                    ])
-                    .current_dir(&temp_dir)
-                    .run()?;
-                Command::new("git")
-                    .args(["reset", "--hard"])
-                    .current_dir(&dir)
-                    .run()?;
-                Command::new("git")
-                    .args(["submodule", "update", "--init", "--recursive", "--progress"])
-                    .current_dir(&dir)
-                    .run()?;
-                dir
-            }
-        };
+        // let rust_dir = match build_dir {
+        //     Ok(build_dir) => {
+        //         println!("Detected SP1_BUILD_DIR, skipping cloning rust.");
+        //         PathBuf::from(build_dir).join("custom-rust")
+        //     }
+        //     Err(_) => {
+        //         // let temp_dir = std::env::temp_dir();
+        //         // let dir = temp_dir.join("sp1-rust");
+        //         let temp_dir = PathBuf::from("/home/semar/Work");
+        //         let dir = temp_dir.join("custom-rust");
+        //         println!("temp_dir: {:?}", temp_dir);
+        //         println!("dir: {:?}", dir);
+        //         if dir.exists() {
+        //             std::fs::remove_dir_all(&dir)?;
+        //         }
+        //
+        //         println!("No SP1_BUILD_DIR detected, cloning rust.");
+        //         let repo_url = match github_access_token {
+        //             Ok(github_access_token) => {
+        //                 println!("Detected GITHUB_ACCESS_TOKEN, using it to clone rust.");
+        //                 format!(
+        //                     "https://{}@github.com/semaraugusto/rust",
+        //                     github_access_token
+        //                 )
+        //             }
+        //             Err(_) => {
+        //                 println!("No GITHUB_ACCESS_TOKEN detected. If you get throttled by Github, set it to bypass the rate limit.");
+        //                 "ssh://git@github.com/semaraugusto/rust".to_string()
+        //             }
+        //         };
+        //         Command::new("git")
+        //             .args([
+        //                 "clone",
+        //                 &repo_url,
+        //                 "--depth=1",
+        //                 "--single-branch",
+        //                 "--branch=succinct",
+        //                 "custom-rust",
+        //             ])
+        //             .current_dir(&temp_dir)
+        //             .run()?;
+        //         Command::new("git")
+        //             .args(["reset", "--hard"])
+        //             .current_dir(&dir)
+        //             .run()?;
+        //         Command::new("git")
+        //             .args(["submodule", "update", "--init", "--recursive", "--progress"])
+        //             .current_dir(&dir)
+        //             .run()?;
+        //         dir
+        //     }
+        // };
+        println!("here");
 
         // Install our config.toml.
         let ci = std::env::var("CI").unwrap_or("false".to_string()) == "true";
@@ -79,6 +85,10 @@ impl BuildToolchainCmd {
                 "CARGO_TARGET_RISCV32IM_SUCCINCT_ZKVM_ELF_RUSTFLAGS",
                 "-Cpasses=loweratomic",
             )
+            .env(
+                "CARGO_TARGET_RISCV64IM_UNICORN_ZKVM_ELF_RUSTFLAGS",
+                "-Cpasses=loweratomic",
+            )
             .args(["x.py", "build"])
             .current_dir(&rust_dir)
             .run()?;
@@ -87,6 +97,10 @@ impl BuildToolchainCmd {
         Command::new("python3")
             .env(
                 "CARGO_TARGET_RISCV32IM_SUCCINCT_ZKVM_ELF_RUSTFLAGS",
+                "-Cpasses=loweratomic",
+            )
+            .env(
+                "CARGO_TARGET_RISCV64IM_UNICORN_ZKVM_ELF_RUSTFLAGS",
                 "-Cpasses=loweratomic",
             )
             .args(["x.py", "build", "--stage", "2"])
