@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// const SYSTEM_START: usize = 0x0C00_0000;
-const SYSTEM_START: usize = 0xF_0000_0000;
+const SYSTEM_START: usize = 0xF000_0000;
+// const SYSTEM_START: usize = 0xF_0000_0000;
 // const SYSTEM_START: usize = 0xFFFF_FFFF_FFFF;
 
 #[allow(clippy::missing_safety_doc)]
