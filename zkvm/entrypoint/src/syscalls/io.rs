@@ -16,7 +16,7 @@ pub extern "C" fn syscall_write(fd: u32, write_buf: *const u8, nbytes: usize) {
             unsafe {
                 asm!(
                     "ecall",
-                    in("t0") crate::syscalls::WRITE,
+                    in("a7") crate::syscalls::WRITE,
                     in("a0") fd,
                     in("a1") write_buf,
                     in("a2") nbytes,

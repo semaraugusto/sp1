@@ -37,7 +37,8 @@ pub extern "C" fn syscall_halt(exit_code: u8) -> ! {
 
         asm!(
             "ecall",
-            in("t0") crate::syscalls::HALT,
+            // in("t0") crate::syscalls::HALT,
+            in("a7") crate::syscalls::HALT,
             in("a0") exit_code
         );
         unreachable!()
