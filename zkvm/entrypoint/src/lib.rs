@@ -65,8 +65,11 @@ mod zkvm {
 
     static STACK_TOP: u32 = 0x0020_0400;
 
-    core::arch::global_asm!(include_str!("memset.s"));
-    core::arch::global_asm!(include_str!("memcpy.s"));
+    // core::arch::global_asm!(include_str!("memset.s"));
+    // core::arch::global_asm!(include_str!("memcpy.s"));
+
+    core::arch::global_asm!(include_str!("musl_memset.s"));
+    core::arch::global_asm!(include_str!("musl_memcpy.s"));
 
     core::arch::global_asm!(
         r#"
