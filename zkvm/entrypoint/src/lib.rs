@@ -6,6 +6,7 @@ pub mod io {
 pub mod precompiles {
     pub use sp1_precompiles::*;
 }
+// use linked_list_allocator::LockedHeap;
 
 extern crate alloc;
 
@@ -15,9 +16,12 @@ macro_rules! entrypoint {
         const ZKVM_ENTRY: fn() = $path;
 
         use $crate::heap::SimpleAlloc;
-
         #[global_allocator]
         static HEAP: SimpleAlloc = SimpleAlloc;
+
+        // use linked_list_allocator::LockedHeap;
+        // #[global_allocator]
+        // static HEAP: LockedHeap = LockedHeap::empty();
 
         mod zkvm_generated_main {
 

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const SYSTEM_START: usize = 0xF000_0000;
-// const SYSTEM_START: usize = 0xF_0000_0000;
+const SYSTEM_START: usize = 0xFFFF_FFFF;
+// const SYSTEM_START: usize = 0xF_0000_0000_0000;
 // const SYSTEM_START: usize = 0xFFFF_FFFF_FFFF;
 
 #[allow(clippy::missing_safety_doc)]
@@ -123,8 +123,8 @@ pub unsafe extern "C" fn sys_alloc_aligned(bytes: usize, align: usize) -> *mut u
 
     // Check to make sure heap doesn't collide with SYSTEM memory.
     if SYSTEM_START < heap_pos {
-        panic!("Heap collision with SYSTEM memory. {SYSTEM_START} < {heap_pos}")
-        // panic!();
+        // panic!("Heap collision with SYSTEM memory. {SYSTEM_START} < {heap_pos}")
+        panic!();
     }
 
     // let msg = "end align -----------------------------------";
